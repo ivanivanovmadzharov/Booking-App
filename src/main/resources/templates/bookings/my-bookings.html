@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>My Bookings — StayEasy</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="container">
+    <h1>My Bookings</h1>
+
+    <div class="empty-state" th:if="${bookings.isEmpty()}">
+        <p>You have no bookings yet. <a th:href="@{/rooms}">Browse rooms</a> to get started.</p>
+    </div>
+
+    <table style="margin-top:1.5rem" th:unless="${bookings.isEmpty()}">
+        <thead>
+        <tr>
+            <th>Room</th>
+            <th>Check-in</th>
+            <th>Check-out</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="booking : ${bookings}">
+            <td th:text="${booking.room.title}">Room</td>
+            <td th:text="${booking.checkIn}">2026-01-01</td>
+            <td th:text="${booking.checkOut}">2026-01-05</td>
+            <td>$<span th:text="${booking.totalPrice}">400</span></td>
+            <td>
+                <span class="badge"
+                      th:classappend="${booking.status.name() == 'CONFIRMED'} ? 'badge-confirmed' : (${booking.status.name() == 'CANCELLED'} ? 'badge-cancelled' : 'badge-pending')"
+                      th:text="${booking.status}">Status</span>
+            </td>
+            <td>
+                <form th:if="${booking.status.name() == 'CONFIRMED'}"
+                      th:action="@{/bookings/{id}/cancel(id=${booking.id})}" method="post"
+                      onsubmit="return confirm('Cancel this booking?');">
+                    <button type="submit" class="btn btn-danger">Cancel</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

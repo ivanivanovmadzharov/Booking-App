@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${room.title} + ' — StayEasy'">Room — StayEasy</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="container">
+    <img th:if="${room.imageUrl != null and !room.imageUrl.isEmpty()}" th:src="${room.imageUrl}"
+         style="width:100%;max-height:360px;object-fit:cover;border-radius:12px" alt="room image">
+
+    <h1 style="margin-top:1.5rem" th:text="${room.title}">Room Title</h1>
+    <p style="color:var(--text-light)" th:text="${room.location}">Location</p>
+    <p th:text="${room.description}">Description</p>
+    <p>Max guests: <strong th:text="${room.maxGuests}">2</strong></p>
+    <p class="price" style="font-size:1.3rem">$<span th:text="${room.pricePerNight}">100</span> / night</p>
+
+    <div sec:authorize="hasAnyRole('GUEST','ADMIN')" style="max-width:420px">
+        <h3>Book this room</h3>
+        <form th:action="@{/bookings/rooms/{id}(id=${room.id})}" th:object="${bookingDto}" method="post">
+            <div class="form-group">
+                <label for="checkIn">Check-in</label>
+                <input type="date" id="checkIn" th:field="*{checkIn}">
+                <div class="error-text" th:if="${#fields.hasErrors('checkIn')}" th:errors="*{checkIn}"></div>
+            </div>
+            <div class="form-group">
+                <label for="checkOut">Check-out</label>
+                <input type="date" id="checkOut" th:field="*{checkOut}">
+                <div class="error-text" th:if="${#fields.hasErrors('checkOut')}" th:errors="*{checkOut}"></div>
+            </div>
+            <button type="submit" class="btn btn-primary">Book Now</button>
+        </form>
+    </div>
+
+    <div sec:authorize="!isAuthenticated()" class="alert alert-error" style="max-width:420px">
+        <a th:href="@{/login}">Log in</a> as a guest to book this room.
+    </div>
+
+    <div sec:authorize="hasRole('HOST')" class="alert alert-error" style="max-width:420px">
+        Hosts cannot book rooms. Log in with a guest account to make a reservation.
+    </div>
+</div>
+</body>
+</html>

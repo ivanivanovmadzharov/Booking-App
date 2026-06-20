@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>My Rooms — StayEasy</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="container">
+    <h1>My Rooms</h1>
+    <a class="btn btn-primary" th:href="@{/rooms/new}">+ Add Room</a>
+
+    <div class="empty-state" th:if="${rooms.isEmpty()}">
+        <p>You haven't listed any rooms yet.</p>
+    </div>
+
+    <table style="margin-top:1.5rem" th:unless="${rooms.isEmpty()}">
+        <thead>
+        <tr>
+            <th>Title</th>
+            <th>Location</th>
+            <th>Price/night</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="room : ${rooms}">
+            <td th:text="${room.title}">Title</td>
+            <td th:text="${room.location}">Location</td>
+            <td>$<span th:text="${room.pricePerNight}">100</span></td>
+            <td>
+                <span class="badge" th:class="${room.available} ? 'badge badge-confirmed' : 'badge badge-cancelled'"
+                      th:text="${room.available} ? 'Available' : 'Unavailable'">Status</span>
+            </td>
+            <td style="display:flex;gap:0.5rem">
+                <a class="btn btn-secondary" th:href="@{/rooms/{id}/edit(id=${room.id})}">Edit</a>
+                <form th:action="@{/rooms/{id}/delete(id=${room.id})}" method="post"
+                      onsubmit="return confirm('Delete this room?');">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
